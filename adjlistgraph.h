@@ -40,11 +40,14 @@ class AdjTypeList
 		AdjTypeList(int _VexNum = 0);
 		~AdjTypeList();
 		void InsertArc(int Vex1, int Vex2);
-		vector<int> getType(int Vex); 
+		vector<int> getType(int Vex);
+		int getRNANum();
+		void setRNANum(); 
 	private:
 		int VexMaxNum;
 		int VexNum;
 		int ArcNum;
+		int RNANum;
 		struct VexNode *VexTable;
 };
 
@@ -53,6 +56,7 @@ AdjTypeList::AdjTypeList(int _VexMaxNum)
 	VexMaxNum = _VexMaxNum;
 	VexNum = 0;
 	ArcNum = 0;
+	RNANum = 0;
 	VexTable = (struct VexNode*)malloc(sizeof(struct VexNode) * VexMaxNum);
 }
 
@@ -75,6 +79,16 @@ void AdjTypeList::InsertArc(int Vex1, int Vex2)
 	q->Num = Vex2;
 	q->Next = p;
 	ArcNum++;
+}
+
+int AdjTypeList::getRNANum()
+{
+	return RNANum;
+}
+
+void AdjTypeList::setRNANum()
+{
+	RNANum++;
 }
 
 vector<int> AdjTypeList::getType(int Vex)

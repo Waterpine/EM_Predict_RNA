@@ -1,6 +1,7 @@
 #include "EM.h"
 #include "adjlistgraph.h"
 
+/* depend on the data */
 #define ROW 3005
 #define COL 557303
 
@@ -11,12 +12,25 @@ int main(void)
 	string typefile = "type.txt";
 	string matrixfile = "matrix.txt";
 	ReadType(typefile, AdjList);
-	vector<int> vec;
-	vec = AdjList.getType(2);
-	for (int i = 0; i < vec.size(); i++)
+	Matrix = ReadMatrix(matrixfile);
+	double result[ROW][AdjList.getRNANum()];
+	double *init;
+	double *predict;
+	for(int i = 0; i < ROW; i++)
 	{
-		cout << vec.at(i) << endl;
+		init = Matrix[i];
+		predict = init;
+		for(int j = 0; j < 1000; j++)
+		{
+			predict = EM_algorithm(init, predict, AdjList);
+		}
 	}
+//	vector<int> vec;
+//	vec = AdjList.getType(2);
+//	for (int i = 0; i < vec.size(); i++)
+//	{
+//		cout << vec.at(i) << endl;
+//	}
 	return 0;
 }
 
@@ -34,16 +48,15 @@ void ReadType(string filename, AdjTypeList AdjList)
 	while(getline(fin, s))
 	{
 		res = tokenize(s, ' ');
+		if (res.size() == 1)
+		{
+			AdjList.setRNANum();
+		}
 		for (auto a : res)
 		{
 			AdjList.InsertArc(linecount, stoi(a));
 		}
 		linecount++;
-//		cout << linecount << endl;
-//		if(linecount == COL)
-//		{
-//			break;
-//		}
 	}
 }
 
@@ -72,6 +85,7 @@ double **ReadMatrix(string filename)
 		{
 			num_col = 0;
 			p[num_row][num_col] = stod(a);
+			cout << a << endl;
 			num_col++;		
 		}
 		num_row++;
@@ -79,12 +93,7 @@ double **ReadMatrix(string filename)
 	return p;
 }
 
-void E_step()
-{
-	
-}
-
-void M_step()
+double* EM_algorithm(double *init, double *p, AdjTypeList AdjList)
 {
 	
 }

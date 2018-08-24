@@ -16,8 +16,7 @@ using namespace std;
 
 void ReadType(string filename, AdjTypeList AdjList);
 double **ReadMatrix(string filename);
-void E_step();
-void M_step();
+double* EM_algorithm(double *init, double *p, AdjTypeList AdjList);
 vector<string> tokenize(const string& s, char c);
 
 #endif
