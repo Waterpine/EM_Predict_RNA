@@ -1,21 +1,25 @@
 #include "EM.h"
 #include "adjlistgraph.h"
 
+#define ROW 3005
+#define COL 557303
+
 int main(void)
 {
+	AdjTypeList AdjList(COL);
+	double **Matrix;
 	string typefile = "type.txt";
 	string matrixfile = "matrix.txt";
+	ReadType(typefile, AdjList);
 	
 	return 0;
 }
 
-AdjTypeList ReadType(string filename)
+void ReadType(string filename, AdjTypeList AdjList)
 {
 	string s;
 	vector<string> res;
 	int linecount = 0;
-	// hard code
-	AdjTypeList AdjList(557303);
 	ifstream fin(filename);
 	if (!fin.is_open())
 	{
@@ -31,7 +35,6 @@ AdjTypeList ReadType(string filename)
 		}
 		linecount++;
 	}
-	return AdjList;
 }
 
 double **ReadMatrix(string filename)
@@ -40,13 +43,10 @@ double **ReadMatrix(string filename)
 	vector<string> res;
 	ifstream fin(filename);
 	double **p;
-	// hard code
-	int row = 3005;
-	int col = 557303;
-	p = (double**)malloc(sizeof(double*) * row);
-	for(int i = 0; i < row; i++)
+	p = (double**)malloc(sizeof(double*) * ROW);
+	for(int i = 0; i < ROW; i++)
 	{
-		*(p+i) = (double*)malloc(sizeof(double) * col);
+		*(p+i) = (double*)malloc(sizeof(double) * COL);
 	}
 	if (!fin.is_open())
 	{

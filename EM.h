@@ -10,10 +10,11 @@
 #include<iostream>
 #include<string>
 #include<vector>
+#include"adjlistgraph.h"
 
 using namespace std;
 
-void ReadType(string filename);
+void ReadType(string filename, AdjTypeList AdjList);
 double **ReadMatrix(string filename);
 void E_step();
 void M_step();
