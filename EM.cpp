@@ -11,7 +11,12 @@ int main(void)
 	string typefile = "type.txt";
 	string matrixfile = "matrix.txt";
 	ReadType(typefile, AdjList);
-	
+	vector<int> vec;
+	vec = AdjList.getType(2);
+	for (int i = 0; i < vec.size(); i++)
+	{
+		cout << vec.at(i) << endl;
+	}
 	return 0;
 }
 
@@ -34,6 +39,11 @@ void ReadType(string filename, AdjTypeList AdjList)
 			AdjList.InsertArc(linecount, stoi(a));
 		}
 		linecount++;
+//		cout << linecount << endl;
+//		if(linecount == COL)
+//		{
+//			break;
+//		}
 	}
 }
 

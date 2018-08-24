@@ -53,20 +53,27 @@ AdjTypeList::AdjTypeList(int _VexMaxNum)
 	VexMaxNum = _VexMaxNum;
 	VexNum = 0;
 	ArcNum = 0;
-	VexTable = new VexNode[VexMaxNum];
+	VexTable = (struct VexNode*)malloc(sizeof(struct VexNode) * VexMaxNum);
 }
 
 AdjTypeList::~AdjTypeList()
 {
-	if(VexTable != NULL)
-	{
-		delete []VexTable;
-	}
+	free(VexTable);
+//	if(VexTable != NULL)
+//	{
+//		delete []VexTable;
+//	}
 }
 
 void AdjTypeList::InsertArc(int Vex1, int Vex2)
 {
-	VexTable[Vex1].Next = new ArcNode(Vex2, VexTable[Vex1].Next);
+	struct ArcNode *p;
+	struct ArcNode *q;
+	p = VexTable[Vex1].Next;
+	VexTable[Vex1].Next = (struct ArcNode*)malloc(sizeof(struct ArcNode));
+	q = VexTable[Vex1].Next;
+	q->Num = Vex2;
+	q->Next = p;
 	ArcNum++;
 }
 
