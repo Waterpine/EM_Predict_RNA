@@ -12,7 +12,9 @@ int main(void)
 	string typefile = "type.txt";
 	string matrixfile = "matrix.txt";
 	ReadType(typefile, AdjList);
+	cout << "finish read type" << endl;
 	Matrix = ReadMatrix(matrixfile);
+	cout << "finish read matrix" << endl;
 	double result[ROW][AdjList.getRNANum()];
 	double *init;
 	double *predict;
@@ -26,18 +28,31 @@ int main(void)
 		{
 			predict[j] = init[j];
 		}
+		cout << "init predict" << endl;
 		for(int j = 0; j < 1000; j++)
 		{
 			predict = EM_algorithm(init, predict, predict_next, AdjList);
+			cout << j << endl;
 		}
 		for(int j = 0; j < AdjList.getRNANum(); j++)
 		{
 			result[i][j] = predict[j];
 		}
+		cout << i << endl;
 	}
 	free(predict);
 	free(predict_next);
-	
+	ofstream ofile;
+	ofile.open("result.txt");
+	for(int i = 0; i < ROW; i++)
+	{
+		for(int j = 0; j < AdjList.getRNANum(); j++)
+		{
+			ofile << result[i][j];
+			ofile << " ";
+		}
+		ofile << endl;
+	}
 //	vector<int> vec;
 //	vec = AdjList.getType(2);
 //	for (int i = 0; i < vec.size(); i++)
@@ -94,11 +109,10 @@ double **ReadMatrix(string filename)
 	while(getline(fin, s))
 	{
 		res = tokenize(s, ' ');
+		num_col = 0;
 		for (auto a : res)
 		{
-			num_col = 0;
 			p[num_row][num_col] = stod(a);
-			cout << a << endl;
 			num_col++;		
 		}
 		num_row++;
@@ -117,7 +131,7 @@ double* EM_algorithm(double *init, double *predict, double *predict_next, AdjTyp
 	} 
 	for (int i = AdjList.getRNANum(); i < COL; i++)
 	{
-		if (predict[i] != 0)
+		if (init[i] != 0)
 		{
 			vec = AdjList.getType(i);
 			total = 0;
@@ -127,7 +141,7 @@ double* EM_algorithm(double *init, double *predict, double *predict_next, AdjTyp
 			}
 			for (int j = 0; j < vec.size(); j++)
 			{
-				predict_next[i] = predict_next[i] + (predict[vec.at(j)] / total * predict[i]);
+				predict_next[vec.at(j)] = predict_next[vec.at(j)] + (predict[vec.at(j)] / total * init[i]);
 			}
 		}
 	}
