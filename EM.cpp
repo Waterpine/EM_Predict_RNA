@@ -16,15 +16,28 @@ int main(void)
 	double result[ROW][AdjList.getRNANum()];
 	double *init;
 	double *predict;
+	double *predict_next;
+	predict = (double *)malloc(sizeof(double) * AdjList.getRNANum());
+	predict_next = (double *)malloc(sizeof(double) * AdjList.getRNANum());
 	for(int i = 0; i < ROW; i++)
 	{
 		init = Matrix[i];
-		predict = init;
+		for(int j = 0; j < AdjList.getRNANum(); j++)
+		{
+			predict[j] = init[j];
+		}
 		for(int j = 0; j < 1000; j++)
 		{
-			predict = EM_algorithm(init, predict, AdjList);
+			predict = EM_algorithm(init, predict, predict_next, AdjList);
+		}
+		for(int j = 0; j < AdjList.getRNANum(); j++)
+		{
+			result[i][j] = predict[j];
 		}
 	}
+	free(predict);
+	free(predict_next);
+	
 //	vector<int> vec;
 //	vec = AdjList.getType(2);
 //	for (int i = 0; i < vec.size(); i++)
@@ -93,16 +106,43 @@ double **ReadMatrix(string filename)
 	return p;
 }
 
-double* EM_algorithm(double *init, double *p, AdjTypeList AdjList)
+double* EM_algorithm(double *init, double *predict, double *predict_next, AdjTypeList AdjList)
 {
-	
+	vector<int> vec;
+	double total = 0;
+	double temp[AdjList.getRNANum()];
+	for (int i = 0; i < AdjList.getRNANum(); i++)
+	{
+		predict_next[i] = init[i];
+	} 
+	for (int i = AdjList.getRNANum(); i < COL; i++)
+	{
+		if (predict[i] != 0)
+		{
+			vec = AdjList.getType(i);
+			total = 0;
+			for (int j = 0; j < vec.size(); j++)
+			{
+				total = total + predict[vec.at(j)];
+			}
+			for (int j = 0; j < vec.size(); j++)
+			{
+				predict_next[i] = predict_next[i] + (predict[vec.at(j)] / total * predict[i]);
+			}
+		}
+	}
+	for (int i = 0; i < AdjList.getRNANum(); i++)
+	{
+		temp[i] = predict_next[i];
+		predict[i] = temp[i];
+	} 
+	return predict;
 }
 
 /* string split function */ 
 vector<string> tokenize(const string& s, char c) {
     auto end = s.cend();
     auto start = end;
-
     vector<string> v;
     for( auto it = s.cbegin(); it != end; ++it ) {
         if( *it != c ) {
