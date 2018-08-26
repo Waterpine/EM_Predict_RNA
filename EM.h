@@ -7,16 +7,15 @@
 #include<cstring>
 #include<ctime>
 #include<fstream>
-#include<iostream>
 #include<string>
 #include<vector>
 #include"adjlistgraph.h"
 
 using namespace std;
 
-void ReadType(string filename, AdjTypeList AdjList);
+void ReadType(string filename, AdjTypeList *AdjList);
 double **ReadMatrix(string filename);
-double* EM_algorithm(double *init, double *predict, double *predict_next, AdjTypeList AdjList);
+double* EM_algorithm(double *init, double *predict, double *predict_next, AdjTypeList *AdjList);
 vector<string> tokenize(const string& s, char c);
 
 #endif

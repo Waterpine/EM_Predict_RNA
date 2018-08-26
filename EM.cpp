@@ -7,34 +7,38 @@
 
 int main(void)
 {
-	AdjTypeList AdjList(COL);
+	AdjTypeList *AdjList = new AdjTypeList(COL);
 	double **Matrix;
 	string typefile = "type.txt";
 	string matrixfile = "matrix.txt";
 	ReadType(typefile, AdjList);
 	cout << "finish read type" << endl;
+	cout << AdjList->getRNANum() << endl; 
 	Matrix = ReadMatrix(matrixfile);
 	cout << "finish read matrix" << endl;
-	double result[ROW][AdjList.getRNANum()];
+	double **result; 
 	double *init;
 	double *predict;
 	double *predict_next;
-	predict = (double *)malloc(sizeof(double) * AdjList.getRNANum());
-	predict_next = (double *)malloc(sizeof(double) * AdjList.getRNANum());
+	result = (double **)malloc(sizeof(double *) * ROW);
+	for(int i = 0; i < ROW; i++)
+	{
+		*(result+i) = (double*)malloc(sizeof(double) * AdjList->getRNANum());
+	}
+	predict = (double *)malloc(sizeof(double) * AdjList->getRNANum());
+	predict_next = (double *)malloc(sizeof(double) * AdjList->getRNANum());
 	for(int i = 0; i < ROW; i++)
 	{
 		init = Matrix[i];
-		for(int j = 0; j < AdjList.getRNANum(); j++)
+		for(int j = 0; j < AdjList->getRNANum(); j++)
 		{
 			predict[j] = init[j];
 		}
-		cout << "init predict" << endl;
-		for(int j = 0; j < 1000; j++)
+		for(int j = 0; j < 100; j++)
 		{
 			predict = EM_algorithm(init, predict, predict_next, AdjList);
-			cout << j << endl;
 		}
-		for(int j = 0; j < AdjList.getRNANum(); j++)
+		for(int j = 0; j < AdjList->getRNANum(); j++)
 		{
 			result[i][j] = predict[j];
 		}
@@ -46,7 +50,7 @@ int main(void)
 	ofile.open("result.txt");
 	for(int i = 0; i < ROW; i++)
 	{
-		for(int j = 0; j < AdjList.getRNANum(); j++)
+		for(int j = 0; j < AdjList->getRNANum(); j++)
 		{
 			ofile << result[i][j];
 			ofile << " ";
@@ -62,11 +66,12 @@ int main(void)
 	return 0;
 }
 
-void ReadType(string filename, AdjTypeList AdjList)
+void ReadType(string filename, AdjTypeList *AdjList)
 {
 	string s;
 	vector<string> res;
 	int linecount = 0;
+	int flag = 0;
 	ifstream fin(filename);
 	if (!fin.is_open())
 	{
@@ -75,17 +80,33 @@ void ReadType(string filename, AdjTypeList AdjList)
 	}
 	while(getline(fin, s))
 	{
+		s = s.substr(0, s.length() - 1);
 		res = tokenize(s, ' ');
-		if (res.size() == 1)
+		if (res.size() == 1 && flag == 0)
 		{
-			AdjList.setRNANum();
+			for (auto a : res)
+			{
+				if(linecount == stoi(a))
+				{
+					AdjList->setRNANum();
+				}
+			}
 		}
-		for (auto a : res)
+		else
 		{
-			AdjList.InsertArc(linecount, stoi(a));
+			flag = 1;
+		}
+		if (res.size() != 0)
+		{
+			for (auto a : res)
+			{
+				AdjList->InsertArc(linecount, stoi(a));
+				// cout << "linecount:" << linecount << "stoi:" << stoi(a) << endl;
+			}
 		}
 		linecount++;
 	}
+	cout << AdjList->getRNANum() << endl;
 }
 
 double **ReadMatrix(string filename)
@@ -120,20 +141,21 @@ double **ReadMatrix(string filename)
 	return p;
 }
 
-double* EM_algorithm(double *init, double *predict, double *predict_next, AdjTypeList AdjList)
+double* EM_algorithm(double *init, double *predict, double *predict_next, AdjTypeList *AdjList)
 {
 	vector<int> vec;
 	double total = 0;
-	double temp[AdjList.getRNANum()];
-	for (int i = 0; i < AdjList.getRNANum(); i++)
+	double *temp;
+	temp = (double *)malloc(sizeof(double) * AdjList->getRNANum());
+	for (int i = 0; i < AdjList->getRNANum(); i++)
 	{
 		predict_next[i] = init[i];
-	} 
-	for (int i = AdjList.getRNANum(); i < COL; i++)
+	}
+	for (int i = AdjList->getRNANum(); i < COL; i++)
 	{
 		if (init[i] != 0)
 		{
-			vec = AdjList.getType(i);
+			vec = AdjList->getType(i);
 			total = 0;
 			for (int j = 0; j < vec.size(); j++)
 			{
@@ -141,15 +163,23 @@ double* EM_algorithm(double *init, double *predict, double *predict_next, AdjTyp
 			}
 			for (int j = 0; j < vec.size(); j++)
 			{
-				predict_next[vec.at(j)] = predict_next[vec.at(j)] + (predict[vec.at(j)] / total * init[i]);
+				if(total != 0)
+				{
+					predict_next[vec.at(j)] = predict_next[vec.at(j)] + (predict[vec.at(j)] / total * init[i]);
+				}
+				else
+				{
+					predict_next[vec.at(j)] = predict_next[vec.at(j)] + init[i] / vec.size(); 
+				}
 			}
 		}
 	}
-	for (int i = 0; i < AdjList.getRNANum(); i++)
+	for (int i = 0; i < AdjList->getRNANum(); i++)
 	{
 		temp[i] = predict_next[i];
 		predict[i] = temp[i];
-	} 
+	}
+	free(temp);
 	return predict;
 }
 

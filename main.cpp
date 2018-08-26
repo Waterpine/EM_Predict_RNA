@@ -1,34 +1,62 @@
-#include"adjlistgraph.h"
-#include<fstream>
+#include "EM.h"
+#include "adjlistgraph.h"
+#include <fstream>
 
-int main()
+int main(void)
 {
-	double *a;
-	double **b;
-	b = (double**)malloc(sizeof(double*) * 10);
-	for(int i = 0; i < 10; i++)
+	AdjTypeList AdjList(COL);
+	double **Matrix;
+	string typefile = "type.txt";
+	string matrixfile = "matrix.txt";
+	ReadType(typefile, AdjList);
+	cout << "finish read type" << endl;
+	Matrix = ReadMatrix(matrixfile);
+	cout << "finish read matrix" << endl;
+	double result[ROW][AdjList.getRNANum()];
+	double *init;
+	double *predict;
+	double *predict_next;
+	predict = (double *)malloc(sizeof(double) * AdjList.getRNANum());
+	predict_next = (double *)malloc(sizeof(double) * AdjList.getRNANum());
+	for(int i = 0; i < ROW; i++)
 	{
-		*(b+i) = (double*)malloc(sizeof(double) * 10);
-	}
-	for(int i = 0; i < 10; i++)
-	{
-		a = b[i];
-		for(int j = 0; j < 10; j++)
+		init = Matrix[i];
+		for(int j = 0; j < AdjList.getRNANum(); j++)
 		{
-			cout << a[j] << endl;
+			predict[j] = init[j];
 		}
+		cout << "init predict" << endl;
+		for(int j = 0; j < 1000; j++)
+		{
+			predict = EM_algorithm(init, predict, predict_next, AdjList);
+			cout << j << endl;
+		}
+		for(int j = 0; j < AdjList.getRNANum(); j++)
+		{
+			result[i][j] = predict[j];
+		}
+		cout << i << endl;
 	}
-//	AdjTypeList AdjList(557303);
-//	AdjList.InsertArc(1,2);
-//	AdjList.InsertArc(1,3);
-//	AdjList.InsertArc(1,4);
+	free(predict);
+	free(predict_next);
+	ofstream ofile;
+	ofile.open("result.txt");
+	for(int i = 0; i < ROW; i++)
+	{
+		for(int j = 0; j < AdjList.getRNANum(); j++)
+		{
+			ofile << result[i][j];
+			ofile << " ";
+		}
+		ofile << endl;
+	}
 //	vector<int> vec;
-//	vec = AdjList.getType(1);
+//	vec = AdjList.getType(2);
 //	for (int i = 0; i < vec.size(); i++)
 //	{
 //		cout << vec.at(i) << endl;
 //	}
-//	cout << vec.size() << endl;
+	return 0;
 }
 
 
