@@ -34,7 +34,7 @@ int main(void)
 		{
 			predict[j] = init[j];
 		}
-		for(int j = 0; j < 100; j++)
+		for(int j = 0; j < 1000; j++)
 		{
 			predict = EM_algorithm(init, predict, predict_next, AdjList);
 		}
@@ -47,7 +47,7 @@ int main(void)
 	free(predict);
 	free(predict_next);
 	ofstream ofile;
-	ofile.open("result.txt");
+	ofile.open("result_1000.txt");
 	for(int i = 0; i < ROW; i++)
 	{
 		for(int j = 0; j < AdjList->getRNANum(); j++)
